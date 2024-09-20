@@ -1,14 +1,19 @@
-name: PR Test
+name: Static Code Analysis
 
 on:
   push:
     branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
       - main
 
 jobs:
-  pr_test:
-    name: Create PR Test
-    runs-on: ubuntu-latest
+  analyse:
+    name: Static Code Analysis
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v4
@@ -16,14 +21,24 @@ jobs:
       - name: Copy env example for initial composer setup
         run: cp .env.example .env
 
+      - name: Trying to Restore Result Cache
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/phpstan
+          key: analysis-result-cache-${{ github.run_id }}
+          restore-keys: |
+            analysis-result-cache-
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.2
           extensions: gd
+        env:
+          APP_ENV: analysis
 
       - name: Install Dependencies
-        run: APP_ENV=analysis composer
+        run: composer
           --ignore-platform-req=ext-zip
           --ignore-platform-req=ext-imagick
           --ignore-platform-req=ext-bcmath
@@ -34,18 +49,12 @@ jobs:
           --ignore-platform-req=ext-elastic_apm
           install
 
-      - name: Generating Baseline
-        run: ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=2G --allow-empty-baseline --generate-baseline phpstan-baseline.neon
+      - name: Analysis
+        run: ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit 2G
 
-      - name: Create commit
-        run: |
-          git config user.name 'StaticAnalysis'
-          git config user.email 'aliaksandr.gg+analyzer@gmail.com'
-          git commit -am "Updated code analyzer baseline"
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+      - name: "Save result cache"
+        uses: actions/cache/save@v4
+        if: always()
         with:
-          token: ${{ secrets.PAT_TEST }}
-          branch: baseline-update
-          delete-branch: true
-          title: '[AUTO] Updated code analyzer baseline'
+          path: /tmp/phpstan
+          key: "analysis-result-cache-${{ github.run_id }}"

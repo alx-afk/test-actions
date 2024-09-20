@@ -6,9 +6,6 @@ services:
     errorFormatter.tst:
         class: Utils\StaticAnalyse\ErrorFormatter\GithubErrorFormatter
 
-#rules:
-#    - Utils\StaticAnalyse\Rule\MyRule
-
 parameters:
     tmpDir: /tmp/phpstan
     paths:
@@ -18,7 +15,7 @@ parameters:
 
     errorFormat: tst
     parallel:
-        maximumNumberOfProcesses: 2
+        maximumNumberOfProcesses: 4
 
     noUnnecessaryCollectionCall: true
     checkMissingIterableValueType: false
