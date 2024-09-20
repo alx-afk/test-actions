@@ -21,14 +21,6 @@ jobs:
       - name: Copy env example for initial composer setup
         run: cp .env.example .env
 
-      - name: Trying to Restore Result Cache
-        uses: actions/cache/restore@v4
-        with:
-          path: /tmp/phpstan
-          key: analysis-result-cache-${{ github.run_id }}
-          restore-keys: |
-            analysis-result-cache-
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -37,8 +29,26 @@ jobs:
         env:
           APP_ENV: analysis
 
+      - name: Trying to Restore Packages From Cache
+        id: cache-packages
+        uses: actions/cache/restore@v4
+        with:
+          path: vendor
+          key: packages-cache-${{ hashFiles('composer.lock') }}
+
+      - name: Trying to Restore Result Cache For Analyzer
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/phpstan
+          key: analysis-result-cache-${{ github.run_id }}
+          restore-keys: |
+            analysis-result-cache-
+
       - name: Install Dependencies
+        if: steps.cache-packages.outputs.cache-hit != 'true'
         run: composer
+          --no-scripts
+          --no-interaction
           --ignore-platform-req=ext-zip
           --ignore-platform-req=ext-imagick
           --ignore-platform-req=ext-bcmath
@@ -52,9 +62,16 @@ jobs:
       - name: Analysis
         run: ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit 2G
 
-      - name: "Save result cache"
+      - name: "Save packages cache"
+        uses: actions/cache/save@v4
+        if: steps.cache-packages.outputs.cache-hit != 'true'
+        with:
+          path: vendor
+          key: packages-cache-${{ hashFiles('composer.lock') }}
+
+      - name: "Save analysis result cache"
         uses: actions/cache/save@v4
         if: always()
         with:
           path: /tmp/phpstan
-          key: "analysis-result-cache-${{ github.run_id }}"
+          key: analysis-result-cache-${{ github.run_id }}
