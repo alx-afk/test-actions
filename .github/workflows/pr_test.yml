@@ -14,15 +14,9 @@ jobs:
   analyse:
     name: Static Code Analysis
     runs-on: ubuntu-20.04
+    timeout-minutes: 5
 
     steps:
-      - name: CPU info
-        run: lscpu
-      - name: Memory info
-        run: free -h
-      - name: Disk space
-        run: df -h
-
       - uses: actions/checkout@v4
 
       - name: Copy env example for initial composer setup
@@ -56,6 +50,7 @@ jobs:
         run: composer
           --no-scripts
           --no-interaction
+          --prefer-dist
           --ignore-platform-req=ext-zip
           --ignore-platform-req=ext-imagick
           --ignore-platform-req=ext-bcmath
@@ -78,7 +73,6 @@ jobs:
 
       - name: "Save analysis result cache"
         uses: actions/cache/save@v4
-        if: always()
         with:
           path: /tmp/phpstan
           key: analysis-result-cache-${{ github.run_id }}
