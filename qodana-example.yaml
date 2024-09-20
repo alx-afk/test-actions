@@ -1,0 +1,31 @@
+version: "1.0"
+profile:
+  name: qodana.test
+include:
+  - name: PhpClassHasTooManyDeclaredMembersInspection
+  - name: VulnerableLibrariesGlobal
+  - name: PhpClassNamingConventionInspection
+  - name: PhpComplexClassInspection
+  - name: PhpComplexFunctionInspection
+  - name: PhpCompoundNamespaceDepthInspection
+  - name: PhpConstantNamingConventionInspection
+  - name: PhpFeatureEnvyLocalInspection
+  - name: PhpFunctionCyclomaticComplexityInspection
+  - name: PhpFunctionNamingConventionInspection
+  - name: PhpHalsteadMetricInspection
+  - name: PhpLackOfCohesionInspection
+  - name: PhpLongTypeFormInspection
+  - name: PhpMemberCanBePulledUpInspection
+  - name: PhpMethodNamingConventionInspection
+  - name: PhpMissingParentCallCommonInspection
+  - name: PhpMissingVisibilityInspection
+  - name: PhpModifierOrderInspection
+  - name: PhpNewClassMissingParameterListInspection
+  - name: PhpPropertyNamingConventionInspection
+  - name: PhpSeparateElseIfInspection
+  - name: PhpTraitsUseListInspection
+  - name: PhpVarUsageInspection
+  - name: PhpVariableNamingConventionInspection
+  - name: PhpVulnerablePathsInspection
+  - name: PhpFullyQualifiedNameUsageInspection
+  - name: PhpUnnecessaryFullyQualifiedNameInspection

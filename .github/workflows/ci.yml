@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+      - release
+  pull_request:
+    branches:
+      - develop
+      - release
+
+jobs:
+  analyse:
+    name: Static Code Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Copy env example for initial composer setup
+        run: cp .env.example .env
+
+      - name: Trying to Restore Result Cache
+        uses: actions/cache@v3
+        with:
+          path: /tmp/phpstan
+          key: analysis-result-cache-${{ github.ref }}${{ github.base_ref }}
+          restore-keys: |
+            analysis-result-cache-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: gd
+
+      - name: Install Dependencies
+        run: APP_ENV=analysis composer
+          --ignore-platform-req=ext-zip
+          --ignore-platform-req=ext-imagick
+          --ignore-platform-req=ext-bcmath
+          --ignore-platform-req=ext-gd
+          --ignore-platform-req=ext-pcntl
+          --ignore-platform-req=ext-rdkafka
+          --ignore-platform-req=ext-sockets
+          --ignore-platform-req=ext-elastic_apm
+          install
+
+      - name: Analysis
+        run: APP_ENV=analysis ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=2G

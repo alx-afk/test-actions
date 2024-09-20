@@ -1,0 +1,22 @@
+docker run \
+   -v $(pwd):/data/project/ \
+   -e QODANA_TOKEN="<qodana-cloud-token>" \
+   -e QODANA_REMOTE_URL="<project-remote-url>" \
+   -e QODANA_BRANCH="<project-branch-name>" \
+   -e QODANA_REVISION="<commit-hash>" \
+   -e QODANA_JOB_URL="<job-url>" \
+   jetbrains/qodana-<linter>
+
+
+
+docker run \
+   -v $(pwd):/app/static-test-app/ \
+   -e QODANA_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmdhbml6YXRpb24iOiIzd0JZNyIsInByb2plY3QiOiJBRGpHWiIsInRva2VuIjoiM3lKMjIifQ.yD8UATaiIjauBPMmo91wfc-K035NybzQAzQoCV2OEqo" \
+   jetbrains/qodana-php
+
+docker run \
+   -p 8080:8080 \
+   -v $(pwd)/:/data/project/ \
+   -e QODANA_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmdhbml6YXRpb24iOiIzd0JZNyIsInByb2plY3QiOiIzeW94ZSIsInRva2VuIjoicFFKWDQifQ.HfwtErd5bPeAtWhil7KaUyunMP_ftrqUDazUhzfA1e8" \
+   jetbrains/qodana-php \
+   --show-report
